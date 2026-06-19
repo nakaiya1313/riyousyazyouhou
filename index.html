@@ -25,6 +25,9 @@
     border-radius:999px; height:46px; padding:0 15px; font-size:.98rem; font-weight:800; cursor:pointer; }
   .tab[aria-selected="true"]{ background:var(--primary); border-color:var(--primary); color:#fff; }
 
+  .seg{ display:flex; gap:6px; background:#eef4f2; border-radius:12px; padding:4px; }
+  .seg-b{ flex:1; border:none; background:transparent; color:var(--muted); font-weight:800; font-size:.95rem; padding:10px 6px; border-radius:9px; cursor:pointer; }
+  .seg-b.on{ background:#fff; color:var(--primary); box-shadow:0 1px 3px rgba(0,0,0,.08); }
   .panel{ display:none; } .panel.active{ display:block; }
   .card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px;
     box-shadow:0 1px 0 #e3ece9, 0 6px 16px rgba(0,0,0,.04); }
@@ -41,6 +44,9 @@
   .btn{ width:100%; border:none; border-radius:14px; cursor:pointer; font-weight:800; font-size:1.1rem; height:54px;
     background:var(--primary); color:#fff; box-shadow:0 4px 0 var(--primary-d); margin-top:14px; }
   .btn:active{ transform:translateY(2px); box-shadow:0 2px 0 var(--primary-d); }
+  .btn-reset{ width:100%; border:1px solid var(--line); background:#fff; color:var(--muted); border-radius:14px;
+    height:46px; font-weight:800; font-size:.98rem; cursor:pointer; margin-top:8px; }
+  .btn-reset:active{ transform:translateY(1px); }
 
   .result{ margin-top:16px; }
   .big-num{ text-align:center; font-size:2.5rem; font-weight:800; color:var(--primary); line-height:1.1; }
@@ -92,6 +98,7 @@
   <div class="tabs" role="tablist">
     <button class="tab" data-tab="bmi" aria-selected="true">📏 BMI</button>
     <button class="tab" data-tab="age" aria-selected="false">🎂 年齢・干支</button>
+    <button class="tab" data-tab="yaku" aria-selected="false">⛩️ 厄年</button>
     <button class="tab" data-tab="vital" aria-selected="false">🩺 バイタル</button>
     <button class="tab" data-tab="jubilee" aria-selected="false">🎉 長寿祝い</button>
     <button class="tab" data-tab="wareki" aria-selected="false">🔁 和暦変換</button>
@@ -107,21 +114,68 @@
       <div><label class="fld" for="bmi-w">体重（kg）</label><input type="number" inputmode="decimal" id="bmi-w" placeholder="55"></div>
     </div>
     <button class="btn" id="bmi-go">計算する</button>
+    <button class="btn-reset" id="bmi-reset">↺ 最初に戻す</button>
     <div class="result" id="bmi-result"></div>
     <div class="note">BMIは目安です。高齢の方ではやや高めが望ましいとされる場合もあり、最終的な判断は医師・専門職が行ってください。</div>
   </div></section>
 
   <!-- AGE -->
   <section class="panel" id="age"><div class="card">
-    <label class="fld">生年月日（直接入力）</label>
-    <div class="dob">
-      <input class="y" type="number" inputmode="numeric" id="age-y" placeholder="1945"><span>年</span>
-      <input class="md" type="number" inputmode="numeric" id="age-m" placeholder="3"><span>月</span>
-      <input class="md" type="number" inputmode="numeric" id="age-d" placeholder="12"><span>日</span>
+    <div class="seg" id="age-seg">
+      <button class="seg-b on" data-mode="dob">生年月日 → 年齢</button>
+      <button class="seg-b" data-mode="age">年齢 → 生まれ年</button>
     </div>
+
+    <div id="age-mode-dob">
+      <label class="fld">生年月日（直接入力）</label>
+      <div class="dob">
+        <input class="y" type="number" inputmode="numeric" id="age-y" placeholder="1945"><span>年</span>
+        <input class="md" type="number" inputmode="numeric" id="age-m" placeholder="3"><span>月</span>
+        <input class="md" type="number" inputmode="numeric" id="age-d" placeholder="12"><span>日</span>
+      </div>
+    </div>
+
+    <div id="age-mode-age" style="display:none">
+      <label class="fld" for="age-in">年齢（満）</label>
+      <input type="number" inputmode="numeric" id="age-in" placeholder="60">
+    </div>
+
     <button class="btn" id="age-go">計算する</button>
+    <button class="btn-reset" id="age-reset">↺ 最初に戻す</button>
     <div class="result" id="age-result"></div>
-    <div class="note">西暦（年）を数字で入力してください。年齢・和暦・干支は本日の日付から自動で計算され、年が変わっても自動更新されます。</div>
+    <div class="note">年齢・和暦・干支は本日の日付から自動計算され、年が変わっても自動更新されます。</div>
+  </div></section>
+
+  <!-- YAKU -->
+  <section class="panel" id="yaku"><div class="card">
+    <div class="seg" id="yk-seg">
+      <button class="seg-b on" data-mode="dob">生年月日で見る</button>
+      <button class="seg-b" data-mode="kazoe">数え年で見る</button>
+    </div>
+
+    <div id="yk-mode-dob">
+      <label class="fld">生年月日（直接入力）</label>
+      <div class="dob">
+        <input class="y" type="number" inputmode="numeric" id="yk-y" placeholder="1983"><span>年</span>
+        <input class="md" type="number" inputmode="numeric" id="yk-m" placeholder="5"><span>月</span>
+        <input class="md" type="number" inputmode="numeric" id="yk-d" placeholder="20"><span>日</span>
+      </div>
+    </div>
+    <div id="yk-mode-kazoe" style="display:none">
+      <label class="fld" for="yk-kazoe">数え年</label>
+      <input type="number" inputmode="numeric" id="yk-kazoe" placeholder="42">
+    </div>
+
+    <label class="fld" style="margin-top:12px">性別</label>
+    <div class="seg" id="yk-sex">
+      <button class="seg-b on" data-sex="m">男性</button>
+      <button class="seg-b" data-sex="f">女性</button>
+    </div>
+
+    <button class="btn" id="yk-go">厄年を調べる</button>
+    <button class="btn-reset" id="yk-reset">↺ 最初に戻す</button>
+    <div class="result" id="yk-result"></div>
+    <div class="note">厄年は数え年での一般的な目安です（男性=25・42・61歳、女性=19・33・37・61歳が本厄、42・33が大厄）。地域や寺社により異なります。</div>
   </div></section>
 
   <!-- VITAL -->
@@ -163,6 +217,7 @@
       <input type="number" inputmode="numeric" id="v-pulse" placeholder="70">
       <div class="out" id="o-pulse"></div>
     </div>
+    <button class="btn-reset" id="v-reset">↺ 最初に戻す</button>
   </div></section>
 
   <!-- JUBILEE -->
@@ -174,6 +229,7 @@
       <input class="md" type="number" inputmode="numeric" id="ju-d" placeholder="12"><span>日</span>
     </div>
     <button class="btn" id="ju-go">長寿祝いを見る</button>
+    <button class="btn-reset" id="ju-reset">↺ 最初に戻す</button>
     <div class="result" id="ju-result"></div>
     <div class="note">満年齢を基準に表示しています。地域や家庭により「数え年」で祝う場合もあります。</div>
   </div></section>
@@ -188,6 +244,7 @@
         <div><label class="fld" for="wa-y">年</label><input type="number" inputmode="numeric" id="wa-y" placeholder="8"></div>
       </div>
       <button class="btn" id="wa-go">西暦に変換</button>
+      <button class="btn-reset" id="wa-reset">↺ 最初に戻す</button>
       <div class="result" id="wa-result"></div>
     </div>
     <div class="card">
@@ -195,6 +252,7 @@
       <label class="fld" for="se-y">西暦（年）</label>
       <input type="number" inputmode="numeric" id="se-y" placeholder="2026">
       <button class="btn" id="se-go">和暦に変換</button>
+      <button class="btn-reset" id="se-reset">↺ 最初に戻す</button>
       <div class="result" id="se-result"></div>
     </div>
   </section>
@@ -208,6 +266,7 @@
     <label class="fld" for="wk-round" style="margin-top:12px">1人あたりの丸め方</label>
     <select id="wk-round"><option value="1">1円単位（割り切り）</option><option value="10">10円単位で切り上げ</option><option value="100" selected>100円単位で切り上げ</option><option value="500">500円単位で切り上げ</option></select>
     <button class="btn" id="wk-go">計算する</button>
+    <button class="btn-reset" id="wk-reset">↺ 最初に戻す</button>
     <div class="result" id="wk-result"></div>
     <div class="note">切り上げた分は「集めたお金 − 合計」として幹事の手元に余ります。</div>
   </div></section>
@@ -221,6 +280,7 @@
       <div><label class="fld" for="u-from">から</label><select id="u-from"></select></div>
       <div><label class="fld" for="u-to">へ</label><select id="u-to"></select></div>
     </div>
+    <button class="btn-reset" id="u-reset">↺ 最初に戻す</button>
     <div class="result" id="u-result"></div>
     <div class="note">料理の計量：大さじ＝15mL、中さじ＝10mL、小さじ＝5mL、1カップ＝200mL。水ならmLとgはほぼ同じです。</div>
   </div></section>
@@ -297,19 +357,84 @@
   document.getElementById('bmi-w').addEventListener('input', calcBMI);
 
   /* ---- AGE ---- */
+  var ageMode='dob';
   function calcAge(){
-    var out=document.getElementById('age-result');
-    var b=makeDate(document.getElementById('age-y'),document.getElementById('age-m'),document.getElementById('age-d'));
-    if(!b){ out.innerHTML='<div class="note">生年月日を正しく入力してください（例：1945 / 3 / 12）。</div>'; return; }
-    var t=new Date(), age=ageAt(b,t), kazoe=t.getFullYear()-b.getFullYear()+1;
-    out.innerHTML='<div class="big-num">満 '+age+' 歳</div><div class="lines">'+
-      '<div class="li"><span class="k">数え年</span><span class="v">'+kazoe+' 歳</span></div>'+
-      '<div class="li"><span class="k">生まれ年（西暦）</span><span class="v">'+b.getFullYear()+' 年</span></div>'+
-      '<div class="li"><span class="k">生まれ年（和暦）</span><span class="v">'+warekiStr(b)+'</span></div>'+
-      '<div class="li"><span class="k">干支（えと）</span><span class="v">'+eto(b.getFullYear())+'</span></div></div>';
+    var out=document.getElementById('age-result'); var t=new Date();
+    if(ageMode==='dob'){
+      var b=makeDate(document.getElementById('age-y'),document.getElementById('age-m'),document.getElementById('age-d'));
+      if(!b){ out.innerHTML='<div class="note">生年月日を正しく入力してください（例：1945 / 3 / 12）。</div>'; return; }
+      var age=ageAt(b,t), kazoe=t.getFullYear()-b.getFullYear()+1;
+      out.innerHTML='<div class="big-num">満 '+age+' 歳</div><div class="lines">'+
+        '<div class="li"><span class="k">数え年</span><span class="v">'+kazoe+' 歳</span></div>'+
+        '<div class="li"><span class="k">生まれ年（西暦）</span><span class="v">'+b.getFullYear()+' 年</span></div>'+
+        '<div class="li"><span class="k">生まれ年（和暦）</span><span class="v">'+warekiStr(b)+'</span></div>'+
+        '<div class="li"><span class="k">干支（えと）</span><span class="v">'+eto(b.getFullYear())+'</span></div></div>';
+    } else {
+      var a=parseInt(document.getElementById('age-in').value,10);
+      if(!(a>=0&&a<=130)){ out.innerHTML='<div class="note">年齢（満）を入力してください。</div>'; return; }
+      var yThis=t.getFullYear()-a, yYet=t.getFullYear()-a-1, kazoe=a+1;
+      out.innerHTML='<div class="big-num">'+yThis+' 〜 '+yYet+' 年生まれ</div>'+
+        '<div class="big-sub" style="color:var(--muted);font-size:.9rem">満'+a+'歳の方の生まれ年</div><div class="lines">'+
+        '<div class="li"><span class="k">誕生日が来た人</span><span class="v">'+yThis+'年（'+warekiStr(new Date(yThis,0,1))+'）'+eto(yThis)+'</span></div>'+
+        '<div class="li"><span class="k">まだ来てない人</span><span class="v">'+yYet+'年（'+warekiStr(new Date(yYet,0,1))+'）'+eto(yYet)+'</span></div>'+
+        '<div class="li"><span class="k">数え年</span><span class="v">'+kazoe+' 歳</span></div></div>';
+    }
   }
+  document.getElementById('age-seg').addEventListener('click', function(e){ var b=e.target.closest('.seg-b'); if(!b) return;
+    ageMode=b.dataset.mode; this.querySelectorAll('.seg-b').forEach(function(x){x.classList.toggle('on',x===b);});
+    document.getElementById('age-mode-dob').style.display = ageMode==='dob'?'':'none';
+    document.getElementById('age-mode-age').style.display = ageMode==='age'?'':'none';
+    document.getElementById('age-result').innerHTML=''; });
   document.getElementById('age-go').addEventListener('click', calcAge);
-  ['age-y','age-m','age-d'].forEach(function(id){ document.getElementById(id).addEventListener('input', calcAge); });
+  ['age-y','age-m','age-d','age-in'].forEach(function(id){ var el=document.getElementById(id); if(el) el.addEventListener('input', calcAge); });
+  document.getElementById('age-reset').addEventListener('click', function(){
+    ['age-y','age-m','age-d','age-in'].forEach(function(id){ document.getElementById(id).value=''; });
+    ageMode='dob'; var sg=document.getElementById('age-seg'); sg.querySelectorAll('.seg-b').forEach(function(x){x.classList.toggle('on',x.dataset.mode==='dob');});
+    document.getElementById('age-mode-dob').style.display=''; document.getElementById('age-mode-age').style.display='none';
+    document.getElementById('age-result').innerHTML=''; });
+
+  /* ---- YAKU ---- */
+  var ykMode='dob', ykSex='m';
+  var YAKU={ m:[25,42,61], f:[19,33,37,61] }, OOYAKU={ m:[42], f:[33] };
+  function calcYaku(){
+    var out=document.getElementById('yk-result'); var t=new Date(); var kazoe=null;
+    if(ykMode==='dob'){
+      var b=makeDate(document.getElementById('yk-y'),document.getElementById('yk-m'),document.getElementById('yk-d'));
+      if(!b){ out.innerHTML='<div class="note">生年月日を正しく入力してください。</div>'; return; }
+      kazoe=t.getFullYear()-b.getFullYear()+1;
+    } else {
+      kazoe=parseInt(document.getElementById('yk-kazoe').value,10);
+      if(!(kazoe>=1&&kazoe<=130)){ out.innerHTML='<div class="note">数え年を入力してください。</div>'; return; }
+    }
+    var hon=YAKU[ykSex], hit=null, type=null;
+    for(var i=0;i<hon.length;i++){ var h=hon[i];
+      if(kazoe===h){ hit=h; type='本厄'; break; }
+      if(kazoe===h-1){ hit=h; type='前厄'; break; }
+      if(kazoe===h+1){ hit=h; type='後厄'; break; } }
+    var head;
+    if(hit===null){ head='<div class="big-num" style="color:var(--ok)">厄年ではありません</div>'; }
+    else { var big=(type==='本厄'&&OOYAKU[ykSex].indexOf(hit)>=0)?'（大厄）':'';
+      head='<div class="big-num" style="color:var(--warn)">'+type+big+'</div><div class="big-sub">本厄は数え'+hit+'歳</div>'; }
+    var list='<div class="lines"><div class="li"><span class="k">数え年</span><span class="v">'+kazoe+' 歳</span></div>'+
+      '<div class="li"><span class="k">'+(ykSex==='m'?'男性':'女性')+'の本厄（数え）</span><span class="v">'+YAKU[ykSex].join('・')+' 歳</span></div></div>';
+    out.innerHTML=head+list;
+  }
+  document.getElementById('yk-seg').addEventListener('click', function(e){ var b=e.target.closest('.seg-b'); if(!b) return;
+    ykMode=b.dataset.mode; this.querySelectorAll('.seg-b').forEach(function(x){x.classList.toggle('on',x===b);});
+    document.getElementById('yk-mode-dob').style.display = ykMode==='dob'?'':'none';
+    document.getElementById('yk-mode-kazoe').style.display = ykMode==='kazoe'?'':'none';
+    document.getElementById('yk-result').innerHTML=''; });
+  document.getElementById('yk-sex').addEventListener('click', function(e){ var b=e.target.closest('.seg-b'); if(!b) return;
+    ykSex=b.dataset.sex; this.querySelectorAll('.seg-b').forEach(function(x){x.classList.toggle('on',x===b);}); calcYaku(); });
+  document.getElementById('yk-go').addEventListener('click', calcYaku);
+  ['yk-y','yk-m','yk-d','yk-kazoe'].forEach(function(id){ var el=document.getElementById(id); if(el) el.addEventListener('input', calcYaku); });
+  document.getElementById('yk-reset').addEventListener('click', function(){
+    ['yk-y','yk-m','yk-d','yk-kazoe'].forEach(function(id){ document.getElementById(id).value=''; });
+    ykMode='dob'; ykSex='m';
+    var sg=document.getElementById('yk-seg'); sg.querySelectorAll('.seg-b').forEach(function(x){x.classList.toggle('on',x.dataset.mode==='dob');});
+    var sx=document.getElementById('yk-sex'); sx.querySelectorAll('.seg-b').forEach(function(x){x.classList.toggle('on',x.dataset.sex==='m');});
+    document.getElementById('yk-mode-dob').style.display=''; document.getElementById('yk-mode-kazoe').style.display='none';
+    document.getElementById('yk-result').innerHTML=''; });
 
   /* ---- VITAL ---- */
   function show(id,cls,txt){ document.getElementById(id).innerHTML = txt? pill(cls,txt):''; }
@@ -436,6 +561,16 @@
     });
     draw();
   })();
+  /* ---- RESET BUTTONS ---- */
+  function clr(){ for(var i=0;i<arguments.length;i++){ var e=document.getElementById(arguments[i]); if(e) e.value=''; } }
+  document.getElementById('bmi-reset').addEventListener('click', function(){ clr('bmi-h','bmi-w'); document.getElementById('bmi-result').innerHTML=''; });
+  document.getElementById('ju-reset').addEventListener('click', function(){ clr('ju-y','ju-m','ju-d'); document.getElementById('ju-result').innerHTML=''; });
+  document.getElementById('wk-reset').addEventListener('click', function(){ clr('wk-total','wk-people'); document.getElementById('wk-round').value='100'; document.getElementById('wk-result').innerHTML=''; });
+  document.getElementById('wa-reset').addEventListener('click', function(){ document.getElementById('wa-era').selectedIndex=0; clr('wa-y'); document.getElementById('wa-result').innerHTML=''; });
+  document.getElementById('se-reset').addEventListener('click', function(){ clr('se-y'); document.getElementById('se-result').innerHTML=''; });
+  document.getElementById('u-reset').addEventListener('click', function(){ document.getElementById('u-cat').value='volume'; clr('u-val'); fillUnits(); document.getElementById('u-result').innerHTML=''; });
+  document.getElementById('v-reset').addEventListener('click', function(){ clr('v-sys','v-dia','v-bs','v-temp','v-spo2','v-pulse'); document.getElementById('v-bsmode').value='fast';
+    ['o-bp','o-bs','o-temp','o-spo2','o-pulse'].forEach(function(id){ document.getElementById(id).innerHTML=''; }); });
 })();
 </script>
 </body>
